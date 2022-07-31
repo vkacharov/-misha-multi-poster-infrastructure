@@ -21,6 +21,8 @@ resource "aws_cloudfront_distribution" "multi_poster_website_distribution" {
   comment             = "CloudFront distribution"
   default_root_object = "index.html"
 
+  aliases = ["mmp.velizarkacharov.com"]
+
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
@@ -51,7 +53,9 @@ resource "aws_cloudfront_distribution" "multi_poster_website_distribution" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn      = "arn:aws:acm:us-east-1:937808942071:certificate/537c9eb7-6390-4866-85bb-136cacda2351"
+    minimum_protocol_version = "TLSv1.2_2021"
+    ssl_support_method       = "sni-only"
   }
 
   lifecycle {
