@@ -1,6 +1,11 @@
+variable "ApplicationId" {
+  type = string
+}
 
-resource "aws_secretsmanager_secret" "multi_poster_website_application_id" {
-  name = "MishaMultiPosterApplicationId"
+resource "aws_ssm_parameter" "multi_poster_website_application_id" {
+  name  = "MishaMultiPosterApplicationId"
+  type  = "String"
+  value = var.ApplicationId
 }
 
 resource "aws_iam_role" "multi_poster_website_code_build_role" {
@@ -53,10 +58,11 @@ resource "aws_iam_role_policy" "multi_poster_website_code_build_role_policy" {
     {
         "Effect": "Allow",
         "Action": [
-            "secretsmanager:GetSecretValue"
+            "ssm:GetParameter",
+            "ssm:GetParameters"
         ],
         "Resource": [
-            "${aws_secretsmanager_secret.multi_poster_website_application_id.arn}"
+            "${aws_ssm_parameter.multi_poster_website_application_id.arn}"
         ]
     }
   ]
@@ -86,8 +92,8 @@ resource "aws_codebuild_project" "multi_poster_website_code_build" {
 
       environment_variable {
         name  = "VITE_APPID"
-        value = "${aws_secretsmanager_secret.multi_poster_website_application_id.name}"
-        type  = "SECRETS_MANAGER"
+        value = "${aws_ssm_parameter.multi_poster_website_application_id.name}"
+        type  = "PARAMETER_STORE"
     }
   }
   
@@ -104,7 +110,7 @@ resource "aws_codebuild_project" "multi_poster_website_code_build" {
     buildspec       = file("${path.module}/buildspec.yaml")
   }
 
-  source_version = "development"
+  source_version = "main"
 }
 
 resource "aws_codebuild_webhook" "multi_poster_website_code_build_webhook" {
