@@ -91,7 +91,7 @@ resource "aws_codebuild_project" "multi_poster_website_code_build" {
     image_pull_credentials_type = "CODEBUILD"
 
       environment_variable {
-        name  = "VITE_APPID"
+        name  = "VITE_APP_ID"
         value = "${aws_ssm_parameter.multi_poster_website_application_id.name}"
         type  = "PARAMETER_STORE"
     }
